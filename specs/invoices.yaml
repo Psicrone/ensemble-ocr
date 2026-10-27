@@ -1,0 +1,33 @@
+# Document-type specs, same format as evalkit/labels.py (copied from evalkit examples/specs/invoices.yaml).
+# One spec drives labelling, scoring and the extraction schema.
+doc_types:
+  invoice: &invoice
+    version: 1
+    description: Supplier invoice
+    dayfirst: true
+    fields:
+      - {path: invoice_number, type: id, required: true, critical: true, description: Invoice number as printed}
+      - {path: invoice_date, type: date, required: true, critical: true}
+      - {path: due_date, type: date}
+      - {path: vendor.name, type: text, threshold: 0.9, required: true}
+      - {path: vendor.vat_number, type: id, pattern: '^4\d{9}$'}
+      - {path: vendor.entity_number, type: id, critical: true, pattern: '^\d{4}-\d{2}$',
+         description: "Registry entity number, checked against the entity API"}
+      - {path: customer.name, type: text, threshold: 0.9}
+      - {path: currency, type: enum, values: [ZAR, USD, EUR]}
+      - {path: purchase_order, type: id}
+      - {path: subtotal, type: amount, abs_tol: 0.01}
+      - {path: tax, type: amount, abs_tol: 0.01}
+      - {path: total, type: amount, abs_tol: 0.01, required: true, critical: true}
+      - {path: "line_items[].description", type: text, threshold: 0.85}
+      - {path: "line_items[].quantity", type: number}
+      - {path: "line_items[].unit_price", type: amount}
+      - {path: "line_items[].amount", type: amount}
+  tax_invoice: *invoice
+  generic:
+    version: 1
+    description: Fallback for documents the classifier cannot place
+    fields:
+      - {path: title, type: text}
+      - {path: "pairs[].key", type: text}
+      - {path: "pairs[].value", type: text}

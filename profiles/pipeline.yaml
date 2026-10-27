@@ -1,0 +1,9 @@
+# Shared by every doc type: the Document AI pre-pass and routing.
+preprocessors:
+  - docai.ocr: {processor_id: "${DOCAI_OCR_PROCESSOR}", project: "${GCP_PROJECT}", location: "${DOCAI_LOCATION:-us}"}
+  - docai.layout: {processor_id: "${DOCAI_LAYOUT_PROCESSOR}", project: "${GCP_PROJECT}", location: "${DOCAI_LOCATION:-us}"}
+  - docai.classify: {processor_id: "${DOCAI_CLASSIFIER_PROCESSOR}", project: "${GCP_PROJECT}", location: "${DOCAI_LOCATION:-us}"}
+
+routing:
+  min_confidence: 0.6   # below this, use the fallback profile and flag the document
+  fallback: generic

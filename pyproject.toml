@@ -1,0 +1,41 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ensemble"
+version = "0.1.0"
+description = "Accurate, stable document extraction: a Gemini ADK agent checked by Document AI, rules and backend validators."
+requires-python = ">=3.11"
+dependencies = [
+  "pydantic>=2.7",
+  "pyyaml>=6",
+  "httpx>=0.27",
+  "google-adk>=2.0",
+  "google-genai>=1.0",
+  "google-cloud-documentai>=3.0",
+]
+
+[project.optional-dependencies]
+render = ["pillow>=10", "pypdfium2>=4"]
+mongo = ["pymongo>=4"]
+eval = ["evalkit @ git+https://github.com/Psicrone/evalkit"]
+dev = ["pytest>=8", "ruff>=0.6", "pillow>=10"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["ensemble"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = ["ignore:SequentialAgent is deprecated:DeprecationWarning"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E731", "B008", "E501", "E741", "UP042"]
