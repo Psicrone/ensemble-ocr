@@ -1,0 +1,8 @@
+doc_types:
+  generic:
+    spec: ../specs/invoices.yaml
+    extractors: [gemini.extract]
+    llm_tools: [ocr.region_text, image.zoom]
+    validators: [docai.ocr_match]
+    thresholds: {accept: 0.85, review: 0.6}
+    max_rounds: 1

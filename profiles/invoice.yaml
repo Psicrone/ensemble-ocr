@@ -1,0 +1,26 @@
+doc_types:
+  invoice:
+    spec: ../specs/invoices.yaml   # evalkit doc-type spec: one source for labels, scoring and extraction
+    extractors:
+      - gemini.extract: {reader_model: gemini-2.5-pro, formatter_model: gemini-2.5-flash, seed: 7,
+                         max_llm_calls: 10, max_tool_calls: 8}
+      # add a second extractor here for ensemble voting
+    llm_tools:
+      - ocr.region_text
+      - layout.table
+      - image.zoom
+      - lookup.entity: {base_url: "${ENTITY_API}", timeout_s: 3}
+    validators:
+      - docai.ocr_match
+      - docai.layout_table
+      - docai.classifier
+      - rules.format
+      - rules.cross_field:
+          rules:
+            - {sum: "line_items[].amount", equals: subtotal}
+            - {sum: [subtotal, tax], equals: total}
+      - api.entity_registry: {base_url: "${ENTITY_API}", timeout_s: 3, name_field: name}
+    weights: {docai.ocr_match: 2, api.entity_registry: 2, rules.cross_field: 1.5, agreement: 1}
+    thresholds: {accept: 0.85, review: 0.6}
+    max_rounds: 2
+    budget_s: 120
